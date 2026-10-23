@@ -1,0 +1,60 @@
+<table class="task-table">
+  <caption class="visually-hidden">
+    Tasks
+  </caption>
+  <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">Status</th>
+      <th scope="col">Priority</th>
+      <th scope="col">Due date</th>
+      <th scope="col"><span class="visually-hidden">Actions</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (task of tasks(); track task.id) {
+      <tr data-testid="task-row" [class.overdue]="isOverdue(task)">
+        <td data-label="Title">
+          <div class="title">{{ task.title }}</div>
+          @if (task.description) {
+            <div class="description">{{ task.description }}</div>
+          }
+        </td>
+        <td data-label="Status">
+          <span class="badge" [class]="'badge status-' + task.status">{{
+            statusLabels[task.status]
+          }}</span>
+        </td>
+        <td data-label="Priority">
+          <span class="badge" [class]="'badge priority-' + task.priority">{{
+            priorityLabels[task.priority]
+          }}</span>
+        </td>
+        <td data-label="Due date">
+          <span>{{ task.dueDate | date: 'mediumDate' }}</span>
+          @if (isOverdue(task)) {
+            <span class="badge overdue-badge" data-testid="overdue-badge">Overdue</span>
+          }
+        </td>
+        <td class="actions">
+          <a
+            class="btn btn-secondary btn-sm"
+            [routerLink]="['/tasks', task.id, 'edit']"
+            [attr.aria-label]="'Edit ' + task.title"
+          >
+            Edit
+          </a>
+          <button
+            type="button"
+            class="btn btn-danger-outline btn-sm"
+            data-testid="delete-button"
+            [attr.aria-label]="'Delete ' + task.title"
+            (click)="deleteRequested.emit(task)"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

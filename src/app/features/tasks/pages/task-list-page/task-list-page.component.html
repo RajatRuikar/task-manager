@@ -1,0 +1,46 @@
+<header class="page-header">
+  <h1>Tasks</h1>
+  <a class="btn btn-primary" routerLink="/tasks/new">+ New task</a>
+</header>
+
+<app-task-summary [stats]="store.stats()" />
+
+<app-task-filters [filters]="store.filters()" (filtersChange)="store.updateFilters($event)" />
+
+@if (store.loading()) {
+  <app-loading-spinner label="Loading tasks…" />
+} @else if (store.error(); as error) {
+  <app-empty-state variant="error" heading="Could not load tasks" [message]="error">
+    <button type="button" class="btn btn-primary" (click)="retry()">Try again</button>
+  </app-empty-state>
+} @else if (store.tasks().length === 0) {
+  <app-empty-state heading="No tasks yet" message="Create your first task to get started.">
+    <a class="btn btn-primary" routerLink="/tasks/new">Create task</a>
+  </app-empty-state>
+} @else if (store.filteredTasks().length === 0) {
+  <app-empty-state heading="No matching tasks" message="No tasks match your search or filters.">
+    <button type="button" class="btn btn-secondary" (click)="store.resetFilters()">
+      Clear filters
+    </button>
+  </app-empty-state>
+} @else {
+  <p class="result-count" aria-live="polite">
+    Showing {{ store.filteredTasks().length }} of {{ store.tasks().length }} tasks
+  </p>
+  <app-task-table
+    [tasks]="store.filteredTasks()"
+    [today]="store.today()"
+    (deleteRequested)="requestDelete($event)"
+  />
+}
+
+<app-confirm-dialog
+  [open]="pendingDelete() !== null"
+  title="Delete task?"
+  [message]="
+    '“' + (pendingDelete()?.title ?? '') + '” will be permanently deleted. This cannot be undone.'
+  "
+  confirmLabel="Delete"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

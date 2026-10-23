@@ -1,0 +1,102 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="task-form">
+  <div class="field">
+    <label for="title">Title <span class="required" aria-hidden="true">*</span></label>
+    <input
+      id="title"
+      type="text"
+      formControlName="title"
+      autocomplete="off"
+      [attr.aria-invalid]="showErrors('title')"
+      aria-describedby="title-error"
+    />
+    @if (showErrors('title')) {
+      <p id="title-error" class="error" data-testid="title-error">
+        @if (form.controls.title.hasError('required') || form.controls.title.hasError('blank')) {
+          Title is required.
+        } @else if (form.controls.title.hasError('minlength')) {
+          Title must contain at least {{ titleMinLength }} characters.
+        }
+      </p>
+    }
+  </div>
+
+  <div class="field">
+    <label for="description">Description</label>
+    <textarea
+      id="description"
+      rows="4"
+      formControlName="description"
+      [attr.aria-invalid]="showErrors('description')"
+      aria-describedby="description-error"
+    ></textarea>
+    @if (showErrors('description')) {
+      <p id="description-error" class="error">Description must be 500 characters or fewer.</p>
+    }
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label for="status">Status <span class="required" aria-hidden="true">*</span></label>
+      <select
+        id="status"
+        formControlName="status"
+        [attr.aria-invalid]="showErrors('status')"
+        aria-describedby="status-error"
+      >
+        <option value="" disabled>Select status</option>
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ statusLabels[status] }}</option>
+        }
+      </select>
+      @if (showErrors('status')) {
+        <p id="status-error" class="error" data-testid="status-error">Status is required.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="priority">Priority <span class="required" aria-hidden="true">*</span></label>
+      <select
+        id="priority"
+        formControlName="priority"
+        [attr.aria-invalid]="showErrors('priority')"
+        aria-describedby="priority-error"
+      >
+        <option value="" disabled>Select priority</option>
+        @for (priority of priorities; track priority) {
+          <option [value]="priority">{{ priorityLabels[priority] }}</option>
+        }
+      </select>
+      @if (showErrors('priority')) {
+        <p id="priority-error" class="error" data-testid="priority-error">Priority is required.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="dueDate">Due date <span class="required" aria-hidden="true">*</span></label>
+      <input
+        id="dueDate"
+        type="date"
+        formControlName="dueDate"
+        [attr.aria-invalid]="showErrors('dueDate')"
+        aria-describedby="dueDate-error"
+      />
+      @if (showErrors('dueDate')) {
+        <p id="dueDate-error" class="error" data-testid="dueDate-error">Due date is required.</p>
+      }
+    </div>
+  </div>
+
+  <div class="actions">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="cancelled.emit()"
+      [disabled]="saving()"
+    >
+      Cancel
+    </button>
+    <button type="submit" class="btn btn-primary" [disabled]="saving()" data-testid="submit-button">
+      {{ saving() ? 'Saving…' : submitLabel() }}
+    </button>
+  </div>
+</form>
